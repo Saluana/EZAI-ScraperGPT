@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"ezai-scraper-api/utils"
+	"ezai_scraper_api/utils"
 	"fmt"
 	"strings"
 
@@ -23,7 +23,8 @@ func NotesRouter(r *gin.Engine) {
 
 		if err != nil {
 			c.JSON(400, gin.H{
-				"error": err.Error(),
+				"status":  "failure",
+				"message": "Problem getting website",
 			})
 			return
 		}
@@ -35,7 +36,8 @@ func NotesRouter(r *gin.Engine) {
 		if err != nil {
 			fmt.Println(err)
 			c.JSON(500, gin.H{
-				"error": err.Error(),
+				"status":  "failure",
+				"message": "Problem getting content",
 			})
 			return
 		}
@@ -48,17 +50,19 @@ func NotesRouter(r *gin.Engine) {
 		// if there is an error, return the error
 		if err != nil {
 			c.JSON(500, gin.H{
-				"error": err.Error(),
+				"status":  "failure",
+				"message": "Problem getting notes",
 			})
 			return
 		}
 
 		// return the notes
 		c.JSON(200, gin.H{
-			"status": "success",
-			"notes":  notes,
-			"title":  content.Title,
-			"url":    url,
+			"status":  "success",
+			"notes":   notes,
+			"title":   content.Title,
+			"url":     url,
+			"message": "Successfully scraped notes from the url",
 		})
 	})
 

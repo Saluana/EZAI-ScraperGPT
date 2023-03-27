@@ -1,7 +1,8 @@
 package main
 
 import (
-	"ezai-scraper-api/routers"
+	"ezai_scraper_api/middleware"
+	"ezai_scraper_api/routers"
 	"fmt"
 	"os"
 
@@ -20,10 +21,12 @@ func main() {
 	if port == "" {
 		port = "8484"
 	}
-
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
 	// Register auth router
+	r.Use(middleware.RateLimit())
+	r.Use(middleware.Auth())
 	routers.NotesRouter(r)
 	routers.SummaryRouter(r)
 

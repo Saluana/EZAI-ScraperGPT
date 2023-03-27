@@ -12,7 +12,7 @@ func CreateContentChunks(text string) []string {
 	words := strings.Fields(text)
 
 	// Set the chunk size to 500.
-	chunkSize := 500
+	chunkSize := 800
 
 	// Calculate the number of chunks needed based on the total number of words in the input text.
 	numChunks := (len(words) + chunkSize - 1) / chunkSize

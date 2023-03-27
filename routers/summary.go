@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"ezai-scraper-api/utils"
+	"ezai_scraper_api/utils"
 	"fmt"
 	"strings"
 
@@ -21,7 +21,8 @@ func SummaryRouter(r *gin.Engine) {
 
 		if err != nil {
 			c.JSON(400, gin.H{
-				"error": err.Error(),
+				"status":  "failure",
+				"message": "Problem getting website",
 			})
 			return
 		}
@@ -33,7 +34,8 @@ func SummaryRouter(r *gin.Engine) {
 		if err != nil {
 			fmt.Println(err)
 			c.JSON(500, gin.H{
-				"error": err.Error(),
+				"status":  "failure",
+				"message": "Problem getting content",
 			})
 			return
 		}
@@ -46,7 +48,8 @@ func SummaryRouter(r *gin.Engine) {
 		// if there is an error, return the error
 		if err != nil {
 			c.JSON(500, gin.H{
-				"error": err.Error(),
+				"status":  "failure",
+				"message": "Problem getting summary",
 			})
 			return
 		}
@@ -57,6 +60,7 @@ func SummaryRouter(r *gin.Engine) {
 			"summary": summary,
 			"title":   content.Title,
 			"url":     url,
+			"message": "Summary generated successfully",
 		})
 	})
 }
