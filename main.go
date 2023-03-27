@@ -11,10 +11,16 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
+	env := os.Getenv("ENVIROMENT")
 
-	if err != nil {
-		fmt.Printf("Error loading environment variables: %s\n", err.Error())
+	if env != "production" {
+		err := godotenv.Load()
+
+		if err != nil {
+			fmt.Printf("Error loading environment variables: %s\n", err.Error())
+			return
+		}
+
 	}
 
 	port := os.Getenv("PORT")

@@ -10,14 +10,18 @@ import (
 
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		err := godotenv.Load()
-		if err != nil {
-			fmt.Printf("Error loading environment variables: %s\n", err.Error())
-			c.AbortWithStatusJSON(500, gin.H{
-				"status": "failure",
-				"error":  "Internal Server Error",
-			})
-			return
+		env := os.Getenv("ENVIROMENT")
+
+		if env != "production" {
+			err := godotenv.Load()
+			if err != nil {
+				fmt.Printf("Error loading environment variables: %s\n", err.Error())
+				c.AbortWithStatusJSON(500, gin.H{
+					"status": "failure",
+					"error":  "Internal Server Error",
+				})
+				return
+			}
 		}
 
 		apiKey := os.Getenv("MS_KEY")

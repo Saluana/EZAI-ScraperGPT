@@ -15,11 +15,14 @@ import (
 
 func GetNote(chunk string) (string, error) {
 
-	err := godotenv.Load()
+	env := os.Getenv("ENVIROMENT")
 
-	if err != nil {
-		fmt.Printf("Error loading environment variables: %s\n", err.Error())
-		return "", err
+	if env != "production" {
+		err := godotenv.Load()
+		if err != nil {
+			fmt.Printf("Error loading environment variables: %s\n", err.Error())
+			return "", err
+		}
 	}
 
 	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
@@ -120,12 +123,15 @@ func GetNotes(splitContent []string) (interface{}, error) {
 }
 
 func GetSummaryChunk(chunk string) (string, error) {
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Printf("Error loading environment variables: %s\n", err.Error())
-		return "", err
-	}
+	env := os.Getenv("ENVIROMENT")
 
+	if env != "production" {
+		err := godotenv.Load()
+		if err != nil {
+			fmt.Printf("Error loading environment variables: %s\n", err.Error())
+			return "", err
+		}
+	}
 	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
