@@ -20,6 +20,15 @@ func NotesRouter(r *gin.Engine) {
 
 		var body RequestBody
 		err := c.BindJSON(&body)
+		key := c.Request.Header.Get("OAI-KEY")
+
+		if len(key) == 0 {
+			c.JSON(400, gin.H{
+				"status":  "failure",
+				"message": "OAI-KEY header is required",
+			})
+			return
+		}
 
 		if err != nil {
 			c.JSON(400, gin.H{
@@ -45,7 +54,7 @@ func NotesRouter(r *gin.Engine) {
 		text := strings.Join(content.Text, " ")
 		chunks := utils.CreateContentChunks(text)
 		// get the notes from the url
-		notes, err := utils.GetNotes(chunks)
+		notes, err := utils.GetNotes(chunks, key)
 
 		// if there is an error, return the error
 		if err != nil {

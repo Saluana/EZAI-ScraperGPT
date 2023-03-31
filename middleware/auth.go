@@ -26,13 +26,22 @@ func Auth() gin.HandlerFunc {
 
 		apiKey := os.Getenv("MS_KEY")
 		key := c.GetHeader("API-Key")
-		if key != apiKey {
+		openAiKey := c.GetHeader("OAI-KEY")
+
+		if key != apiKey && len(openAiKey) > 0 {
+			c.Next()
+		}
+
+		if key != apiKey && len(openAiKey) == 0 {
 			c.AbortWithStatusJSON(401, gin.H{
 				"status": "failure",
 				"error":  "Unauthorized",
 			})
 			return
 		}
+
+		oaiKey := os.Getenv("OPENAI_API_KEY")
+		c.Request.Header.Set("OAI-KEY", oaiKey)
 
 		c.Next()
 	}

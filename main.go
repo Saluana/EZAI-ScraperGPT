@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -30,7 +31,11 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://localhost:3000", "https://ezai.co"}
+
 	// Register auth router
+	r.Use(cors.New(config))
 	r.Use(middleware.RateLimit())
 	r.Use(middleware.Auth())
 	routers.NotesRouter(r)

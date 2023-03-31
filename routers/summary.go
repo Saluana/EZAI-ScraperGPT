@@ -27,6 +27,15 @@ func SummaryRouter(r *gin.Engine) {
 			return
 		}
 
+		oaiKey := c.Request.Header.Get("OAI-KEY")
+		if len(oaiKey) == 0 {
+			c.JSON(400, gin.H{
+				"status":  "failure",
+				"message": "OAI-KEY header is required",
+			})
+			return
+		}
+
 		url := body.URL
 
 		content, err := utils.ContentFinder(url)
@@ -43,7 +52,7 @@ func SummaryRouter(r *gin.Engine) {
 		text := strings.Join(content.Text, " ")
 		chunks := utils.CreateContentChunks(text)
 		// get the notes from the url
-		summary, err := utils.GetSummary(chunks)
+		summary, err := utils.GetSummary(chunks, oaiKey)
 
 		// if there is an error, return the error
 		if err != nil {

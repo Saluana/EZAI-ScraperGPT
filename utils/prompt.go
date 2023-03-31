@@ -5,27 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"os"
 	"strings"
 	"sync"
 
-	"github.com/joho/godotenv"
 	openai "github.com/sashabaranov/go-openai"
 )
 
-func GetNote(chunk string) (string, error) {
-
-	env := os.Getenv("ENVIROMENT")
-
-	if env != "production" {
-		err := godotenv.Load()
-		if err != nil {
-			fmt.Printf("Error loading environment variables: %s\n", err.Error())
-			return "", err
-		}
-	}
-
-	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
+func GetNote(chunk string, openaiKey string) (string, error) {
+	client := openai.NewClient(openaiKey)
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
@@ -59,7 +46,7 @@ func GetNote(chunk string) (string, error) {
 	return resp.Choices[0].Message.Content, nil
 }
 
-func GetNotes(splitContent []string) (interface{}, error) {
+func GetNotes(splitContent []string, openaiKey string) (interface{}, error) {
 	// Create a slice to store the results of each note
 	notes := make([]string, len(splitContent))
 
@@ -71,8 +58,9 @@ func GetNotes(splitContent []string) (interface{}, error) {
 	for i, content := range splitContent {
 		go func(i int, content string) {
 			defer wg.Done()
+
 			// Get the note for the content and store the result in the notes slice
-			note, err := GetNote(content)
+			note, err := GetNote(content, openaiKey)
 
 			if err != nil {
 				log.Println(err)
@@ -122,17 +110,8 @@ func GetNotes(splitContent []string) (interface{}, error) {
 	return completeNotes, nil
 }
 
-func GetSummaryChunk(chunk string) (string, error) {
-	env := os.Getenv("ENVIROMENT")
-
-	if env != "production" {
-		err := godotenv.Load()
-		if err != nil {
-			fmt.Printf("Error loading environment variables: %s\n", err.Error())
-			return "", err
-		}
-	}
-	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
+func GetSummaryChunk(chunk string, openaiKey string) (string, error) {
+	client := openai.NewClient(openaiKey)
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
@@ -159,7 +138,7 @@ func GetSummaryChunk(chunk string) (string, error) {
 	return resp.Choices[0].Message.Content, nil
 }
 
-func GetSummary(splitContent []string) (string, error) {
+func GetSummary(splitContent []string, openaiKey string) (string, error) {
 	// Create a channel to receive results from the goroutines
 	results := make(chan string)
 
@@ -172,7 +151,7 @@ func GetSummary(splitContent []string) (string, error) {
 		go func(chunk string) {
 			defer wg.Done()
 			// Summarize the chunk and send the result to the results channel
-			summary, err := GetSummaryChunk(chunk)
+			summary, err := GetSummaryChunk(chunk, openaiKey)
 			if err != nil {
 				log.Println(err)
 				return
@@ -197,7 +176,7 @@ func GetSummary(splitContent []string) (string, error) {
 
 	// Concatenate the summaries into a single string and return it
 	rawSummary := strings.Join(summaryList, "\n")
-	completeSummary, err := GetSummaryChunk(rawSummary)
+	completeSummary, err := GetSummaryChunk(rawSummary, openaiKey)
 
 	if (err != nil) || (completeSummary == "") {
 		completeSummary = rawSummary
