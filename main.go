@@ -32,7 +32,10 @@ func main() {
 	r := gin.Default()
 
 	config := cors.DefaultConfig()
+	config.AllowHeaders = []string{"OAI-KEY", "Content-Type", "API-Key"}
 	config.AllowOrigins = []string{"http://localhost:3000", "https://ezai.co"}
+	config.AllowMethods = []string{"GET", "POST"}
+	config.AllowCredentials = true
 
 	// Register auth router
 	r.Use(cors.New(config))
