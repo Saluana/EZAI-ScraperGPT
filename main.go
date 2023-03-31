@@ -33,7 +33,7 @@ func main() {
 
 	config := cors.DefaultConfig()
 	config.AllowHeaders = []string{"OAI-KEY", "Content-Type", "API-Key"}
-	config.AllowOrigins = []string{"http://localhost:3000", "https://ezai.co"}
+	config.AllowAllOrigins = true
 	config.AllowMethods = []string{"GET", "POST"}
 	config.AllowCredentials = true
 
