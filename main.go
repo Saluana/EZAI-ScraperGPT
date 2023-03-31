@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -31,18 +30,37 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
-	config := cors.DefaultConfig()
-	config.AllowHeaders = []string{"OAI-KEY", "Content-Type", "API-Key"}
-	config.AllowAllOrigins = true
-	config.AllowMethods = []string{"GET", "POST"}
-	config.AllowCredentials = true
+	/*
+		config := cors.DefaultConfig()
+		config.AllowHeaders = []string{"OAI-KEY", "Content-Type", "API-Key"}
+		config.AllowAllOrigins = true
+		config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+		config.AllowCredentials = true
 
-	// Register auth router
-	r.Use(cors.New(config))
+		// Register auth router
+		r.Use(cors.New(config))
+	*/
+	r.Use(CORSMiddleware())
 	r.Use(middleware.RateLimit())
 	r.Use(middleware.Auth())
 	routers.NotesRouter(r)
 	routers.SummaryRouter(r)
 
 	r.Run(":" + port)
+}
+
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With, OAI-KEY, API-Key")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
 }
