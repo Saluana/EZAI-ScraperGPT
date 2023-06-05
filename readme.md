@@ -74,21 +74,6 @@ This is the documentation for Ezai Scraper API.
 }
 ```
 
-## Routers
-
-The NotesRouter function initializes the routes and middlewares for this API.
-
-```go
-func NotesRouter(r *gin.Engine)
-```
-
-## Middlewares
-
-The following middleware are used for the route:
-
-1. `RateLimit()`
-2. `Auth()`
-
 ### Create Summary
 
 **Method**: `POST`
@@ -156,15 +141,3 @@ The following middleware are used for the route:
     "message": "Problem getting summary"
 }
 ```
-
-## Routers
-
-The SummaryRouter function initializes the routes and middlewares for this API.
-
-```go
-func SummaryRouter(r *gin.Engine)
-```
-
-## Middlewares
-
-The following middleware are used for
