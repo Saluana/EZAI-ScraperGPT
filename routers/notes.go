@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"ezai_scraper_api/middleware"
 	"ezai_scraper_api/utils"
 	"fmt"
 	"strings"
@@ -11,9 +12,11 @@ import (
 // create route
 
 func NotesRouter(r *gin.Engine) {
-	notesGroup := r.Group("/notes")
+	notesGroup := r.Group("notes")
+	notesGroup.Use(middleware.RateLimit())
+	notesGroup.Use(middleware.Auth())
 
-	notesGroup.POST("/", func(c *gin.Context) {
+	notesGroup.POST("", func(c *gin.Context) {
 		type RequestBody struct {
 			URL string `json:"url"`
 		}

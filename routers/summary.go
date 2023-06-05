@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"ezai_scraper_api/middleware"
 	"ezai_scraper_api/utils"
 	"fmt"
 	"strings"
@@ -9,9 +10,11 @@ import (
 )
 
 func SummaryRouter(r *gin.Engine) {
-	summaryGroup := r.Group("/summary")
+	summaryGroup := r.Group("summary")
+	summaryGroup.Use(middleware.RateLimit())
+	summaryGroup.Use(middleware.Auth())
 
-	summaryGroup.POST("/", func(c *gin.Context) {
+	summaryGroup.POST("", func(c *gin.Context) {
 		type RequestBody struct {
 			URL string `json:"url"`
 		}

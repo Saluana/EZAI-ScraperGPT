@@ -20,7 +20,7 @@ func GetNote(chunk string, openaiKey string) (string, error) {
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleSystem,
-					Content: "I need you to create a bullet point list of short notes from key topics in the text the user has provided. Use '->' as the bullet point for each note. Please remove and ignore any unwanted text, such as things related to website cookies, website newletters, and website advertisements. Use the example text, and example notes as a guide.",
+					Content: "I need you to create a short bullet point list of notes from key topics in the text the user has provided. Use '->' as the bullet point for each note. Please remove and ignore any unwanted text, such as things related to website cookies, website newletters, and website advertisements. Use the example text, and example notes as a guide.",
 				},
 				{
 					Role:    openai.ChatMessageRoleUser,
@@ -138,6 +138,34 @@ func GetSummaryChunk(chunk string, openaiKey string) (string, error) {
 	return resp.Choices[0].Message.Content, nil
 }
 
+func getLongerSummary(summary string, openaiKey string) (string, error) {
+	client := openai.NewClient(openaiKey)
+	resp, err := client.CreateChatCompletion(
+		context.Background(),
+		openai.ChatCompletionRequest{
+			Model: openai.GPT3Dot5Turbo,
+			Messages: []openai.ChatCompletionMessage{
+				{
+					Role:    openai.ChatMessageRoleSystem,
+					Content: "Write a concise summary with all of the main details, and important information from the text provided by the user. The summary should be no longer then two or three short paragraphs. Remove any unwanted text, such as things related to website cookies, website newletters, and website advertisements.",
+				},
+				{
+					Role:    openai.ChatMessageRoleUser,
+					Content: summary + "\n Short summary:",
+				},
+			},
+			Temperature: 0.85,
+		},
+	)
+
+	if err != nil {
+		fmt.Printf("ChatCompletion error: %v\n", err)
+		return "", err
+	}
+
+	return resp.Choices[0].Message.Content, nil
+}
+
 func GetSummary(splitContent []string, openaiKey string) (string, error) {
 	// Create a channel to receive results from the goroutines
 	results := make(chan string)
@@ -176,7 +204,7 @@ func GetSummary(splitContent []string, openaiKey string) (string, error) {
 
 	// Concatenate the summaries into a single string and return it
 	rawSummary := strings.Join(summaryList, "\n")
-	completeSummary, err := GetSummaryChunk(rawSummary, openaiKey)
+	completeSummary, err := getLongerSummary(rawSummary, openaiKey)
 
 	if (err != nil) || (completeSummary == "") {
 		completeSummary = rawSummary
